@@ -1,5 +1,5 @@
 import { User } from '../../typeorm/user/user.entity.ts';
-// import { hashPassword } from '../../utils/fn.ts';
+import { hashPassword } from '../../utils/fn.ts';
 import { GraphQLContext } from '../context.ts';
 
 const getUserById = async (
@@ -18,12 +18,12 @@ const createUser = async (
   { userRepo }: GraphQLContext
 ) => {
   const existing = await userRepo.findOneBy({ email: data.email });
-
+  const hashedPassword = await hashPassword(data.password!);
   if (existing) throw new Error('Email já em uso.');
-
+  console.log(data);
   const user = userRepo.create({
     ...data,
-    // password: hashPassword(data.password!),
+    password: hashedPassword,
   });
 
   return await userRepo.save(user);

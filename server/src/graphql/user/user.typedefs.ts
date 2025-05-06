@@ -11,6 +11,7 @@ export const userTypeDefs = `#graphql
     updateAt: String!
     sentFriendRequests: [Friendship]!
     receivedFriendRequests: [Friendship]!
+    password: String
   }
 
   extend type Query {

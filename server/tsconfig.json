@@ -12,6 +12,8 @@
     "noEmit": true,
     "strictPropertyInitialization": false
   },
+  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules", ".vscode"],
   "ts-node": {
     "esm": true
   }
