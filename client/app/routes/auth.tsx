@@ -75,7 +75,11 @@ export default function Login() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchemaSignIn>) {
+  function onSubmitSignIn(values: z.infer<typeof formSchemaSignIn>) {
+    console.log(values);
+  }
+
+  function onSubmitSignUp(values: z.infer<typeof formSchemaSignIn>) {
     console.log(values);
   }
 
@@ -83,7 +87,7 @@ export default function Login() {
     <div className='h-full flex  justify-center'>
       <IconsBackground />
 
-      <Tabs defaultValue='Sign In' className='z-10 w-[600px] mt-[20%]'>
+      <Tabs defaultValue='Sign In' className='z-10 w-[600px] mt-[12%]'>
         <TabsList className='grid w-full grid-cols-2'>
           <TabsTrigger value='Sign In'>Sign In</TabsTrigger>
           <TabsTrigger value='Sign Up'>Sign Up</TabsTrigger>
@@ -96,7 +100,7 @@ export default function Login() {
 
             <Form {...formSignIn}>
               <form
-                onSubmit={formSignIn.handleSubmit(onSubmit)}
+                onSubmit={formSignIn.handleSubmit(onSubmitSignIn)}
                 className='space-y-8'
               >
                 <FormField
@@ -149,7 +153,7 @@ export default function Login() {
 
             <Form {...formSignUp}>
               <form
-                onSubmit={formSignUp.handleSubmit(onSubmit)}
+                onSubmit={formSignUp.handleSubmit(onSubmitSignUp)}
                 className='space-y-6'
               >
                 <div className='flex items-start gap-4'>

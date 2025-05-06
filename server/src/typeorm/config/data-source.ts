@@ -1,5 +1,9 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
+import { Friendship } from '../friendship/friendship.entity.ts';
+import { User } from '../user/user.entity.ts';
+import { Notification } from '../notification/notification.entity.ts';
+import { Post } from '../post/post.entity.ts';
 
 export const AppDataSource = new DataSource({
   type: process.env.DB_TYPE as 'mysql',
@@ -10,5 +14,5 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   logging: true,
-  entities: [],
+  entities: [Friendship, User, Notification, Post],
 });

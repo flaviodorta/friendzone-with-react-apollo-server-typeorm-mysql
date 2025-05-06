@@ -1,7 +1,8 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
-import {} from 'graphql';
-import { AppDataSource } from './config/data-source.ts';
+import { AppDataSource } from './typeorm/config/data-source.ts';
+import { typeDefs, resolvers } from './graphql/schema.ts';
+import { context } from './graphql/context.ts';
 
 export async function waitForDatabaseConnection(
   connectFn: () => Promise<any>,
@@ -43,39 +44,13 @@ async function startServer() {
     console.log('TypeORM conectado ao MySQL com sucesso!');
 
     const server = new ApolloServer({
-      typeDefs: `#graphql
-    type User {
-      id: ID!
-      name: String
-      email: String!
-      password: String!
-      avatar_url: String!
-      bio: String
-      created_at: String!
-    }
-
-    type Post {
-      id: ID!
-      user_id: ID!
-      content: String!
-      created_at: String
-    }
-
-    type Query {
-      user: User
-      users: [User]
-      posts: [Post]
-    }
-  `,
-      resolvers: {
-        Query: {
-          users: () => users,
-        },
-      },
+      typeDefs,
+      resolvers,
     });
 
     const { url } = await startStandaloneServer(server, {
       listen: { port: 4000 },
+      context,
     });
 
     console.log(`🚀 Server ready at: ${url}`);
