@@ -6,8 +6,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../user/user.entity.ts';
-import { Friendship } from '../friendship/friendship.entity.ts';
+import { User } from './user.entity.ts';
+import { Friendship } from '../entities/friendship.entity.ts';
 
 export type NotificationType = 'friend_request' | 'tag' | 'like' | 'comment';
 

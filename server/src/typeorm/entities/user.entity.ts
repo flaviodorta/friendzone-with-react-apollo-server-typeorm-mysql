@@ -6,7 +6,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Friendship } from '../friendship/friendship.entity.ts';
+import { Friendship } from './friendship.entity.ts';
+import { Session } from './session.entity.ts';
+import { Post } from './post.entity.ts';
 
 @Entity()
 export class User {
@@ -42,6 +44,12 @@ export class User {
 
   @OneToMany(() => Friendship, (friendship) => friendship.recipient)
   receivedFriendRequests: Friendship[];
+
+  @OneToMany(() => Session, (session) => session.user)
+  sessions: Session[];
+
+  // @OneToMany(() => Post, (post) => post.author)
+  // posts: Post[];
 
   @CreateDateColumn()
   createdAt: Date;

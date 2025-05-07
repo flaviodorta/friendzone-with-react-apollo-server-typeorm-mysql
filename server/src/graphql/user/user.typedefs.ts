@@ -1,17 +1,18 @@
 export const userTypeDefs = `#graphql
   type User {
     id: ID!
-    firstName: String!
-    lastName: String!
+    firstName: String
+    email: String
+    lastName: String
     profilePhotoUrl: String
     backgroundPhotoUrl: String
     bio: String
-    birthday: String!
-    createdAt: String!
-    updateAt: String!
+    birthday: String
+    createdAt: String
+    updateAt: String
     sentFriendRequests: [Friendship]!
     receivedFriendRequests: [Friendship]!
-    password: String
+    # password: String
   }
 
   extend type Query {

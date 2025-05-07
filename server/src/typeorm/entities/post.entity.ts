@@ -4,9 +4,10 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../user/user.entity.ts';
+import { User } from './user.entity.ts';
 
 @Entity()
 export class Post {
@@ -17,7 +18,7 @@ export class Post {
   content: string;
 
   @ManyToOne(() => User, { eager: true })
-  author: User;
+  author: Relation<User>;
 
   @CreateDateColumn()
   createdAt: Date;

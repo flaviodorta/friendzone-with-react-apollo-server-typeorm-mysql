@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../user/user.entity.ts';
+import { User } from './user.entity.ts';
 
 export type FriendshipStatus = 'pending' | 'accepted' | 'rejected';
 

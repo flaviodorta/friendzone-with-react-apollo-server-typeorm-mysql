@@ -1,9 +1,10 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { Friendship } from '../friendship/friendship.entity.ts';
-import { User } from '../user/user.entity.ts';
-import { Notification } from '../notification/notification.entity.ts';
-import { Post } from '../post/post.entity.ts';
+import { Friendship } from '../entities/friendship.entity.ts';
+import { User } from '../entities/user.entity.ts';
+import { Notification } from '../entities/notification.entity.ts';
+import { Post } from '../entities/post.entity.ts';
+import { Session } from '../entities/session.entity.ts';
 
 export const AppDataSource = new DataSource({
   type: process.env.DB_TYPE as 'mysql',
@@ -14,5 +15,5 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   logging: true,
-  entities: [Friendship, User, Notification, Post],
+  entities: [Friendship, User, Notification, Post, Session],
 });
