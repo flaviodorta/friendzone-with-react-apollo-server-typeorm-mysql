@@ -24,6 +24,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '../components/ui/tabs';
+import { useLogin } from '~/hooks/use-login';
+import { FaSpinner } from 'react-icons/fa';
 
 const formSchemaSignIn = z.object({
   email: z
@@ -55,6 +57,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Login() {
+  const [login, { loading, error }] = useLogin();
   const formSignIn = useForm<z.infer<typeof formSchemaSignIn>>({
     resolver: zodResolver(formSchemaSignIn),
     defaultValues: {
@@ -75,8 +78,18 @@ export default function Login() {
     },
   });
 
-  function onSubmitSignIn(values: z.infer<typeof formSchemaSignIn>) {
-    console.log(values);
+  async function onSubmitSignIn(values: z.infer<typeof formSchemaSignIn>) {
+    try {
+      const { data } = await login({
+        variables: {
+          email: values.email,
+          password: values.password,
+        },
+      });
+      console.log(data);
+    } catch (err) {
+      console.error('erro login', err);
+    }
   }
 
   function onSubmitSignUp(values: z.infer<typeof formSchemaSignIn>) {
@@ -137,8 +150,8 @@ export default function Login() {
                   )}
                 />
 
-                <Button type='submit' className='w-full'>
-                  Log in to your account
+                <Button type='submit' className='w-full cursor-pointer'>
+                  {loading && <FaSpinner />} Log in to your account
                 </Button>
               </form>
             </Form>
@@ -254,7 +267,7 @@ export default function Login() {
                   )}
                 />
 
-                <Button type='submit' className='w-full'>
+                <Button type='submit' className='w-full cursor-pointer'>
                   Create your account
                 </Button>
               </form>
