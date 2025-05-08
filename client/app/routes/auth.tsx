@@ -1,4 +1,4 @@
-'use client';
+// 'use client';
 
 import type { Route } from '../+types/root';
 
@@ -61,8 +61,8 @@ export default function Login() {
   const formSignIn = useForm<z.infer<typeof formSchemaSignIn>>({
     resolver: zodResolver(formSchemaSignIn),
     defaultValues: {
-      email: '',
-      password: '',
+      email: 'jimmy2@gmail.com',
+      password: '12345678',
     },
   });
 
