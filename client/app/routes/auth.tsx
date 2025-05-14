@@ -26,6 +26,8 @@ import {
 } from '../components/ui/tabs';
 import { useLogin } from '~/hooks/use-login';
 import { FaSpinner } from 'react-icons/fa';
+import { useNavigate } from 'react-router';
+import { useCreateUser } from '~/hooks/use-create-user';
 
 const formSchemaSignIn = z.object({
   email: z
@@ -45,7 +47,7 @@ const formSchemaSignUp = z.object({
     .min(8, { message: 'Password must be at least 8 characters.' }),
   firstName: z.string().min(1, { message: 'First name is required.' }),
   lastName: z.string().min(1, { message: 'Last name is required.' }),
-  birthdate: z.string().min(1, { message: 'Birthdate is required.' }), // pode validar melhor depois
+  birthday: z.string().min(1, { message: 'Birthdate is required.' }), // pode validar melhor depois
   gender: z.enum(['male', 'female', 'other']),
 });
 
@@ -58,10 +60,12 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Login() {
   const [login, { loading, error }] = useLogin();
+  const [createUser] = useCreateUser();
+  const navigate = useNavigate();
   const formSignIn = useForm<z.infer<typeof formSchemaSignIn>>({
     resolver: zodResolver(formSchemaSignIn),
     defaultValues: {
-      email: 'jimmy2@gmail.com',
+      email: 'jimmy@gmail.com',
       password: '12345678',
     },
   });
@@ -73,7 +77,7 @@ export default function Login() {
       password: '',
       firstName: '',
       lastName: '',
-      birthdate: '',
+      birthday: '',
       gender: 'other',
     },
   });
@@ -87,13 +91,29 @@ export default function Login() {
         },
       });
       console.log(data);
+      navigate('/feed');
     } catch (err) {
       console.error('erro login', err);
     }
   }
 
-  function onSubmitSignUp(values: z.infer<typeof formSchemaSignIn>) {
-    console.log(values);
+  async function onSubmitSignUp(values: z.infer<typeof formSchemaSignUp>) {
+    try {
+      // console.log(values);
+      const { data } = await createUser({
+        variables: {
+          email: values.email,
+          password: values.password,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          birthday: values.birthday,
+          gender: values.gender,
+        },
+      });
+      console.log(data);
+    } catch (err) {
+      console.log('error sign up', err);
+    }
   }
 
   return (
@@ -201,7 +221,7 @@ export default function Login() {
                 <div className='flex items-start gap-4'>
                   <FormField
                     control={formSignUp.control}
-                    name='birthdate'
+                    name='birthday'
                     render={({ field }) => (
                       <FormItem className='w-full'>
                         <FormLabel>Birthdate</FormLabel>

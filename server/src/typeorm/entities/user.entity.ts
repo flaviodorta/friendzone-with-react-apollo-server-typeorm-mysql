@@ -25,6 +25,9 @@ export class User {
   firstName: string;
 
   @Column()
+  gender: string;
+
+  @Column()
   lastName: string;
 
   @Column({ nullable: true })
@@ -48,8 +51,8 @@ export class User {
   @OneToMany(() => Session, (session) => session.user)
   sessions: Session[];
 
-  // @OneToMany(() => Post, (post) => post.author)
-  // posts: Post[];
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Post[];
 
   @CreateDateColumn()
   createdAt: Date;

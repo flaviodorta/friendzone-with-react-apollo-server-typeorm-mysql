@@ -5,9 +5,11 @@ import { User } from '../typeorm/entities/user.entity.ts';
 import { Post } from '../typeorm/entities/post.entity.ts';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Session } from '../typeorm/entities/session.entity.ts';
+import { parseCookies, verifyRefreshToken } from '../utils/fn.ts';
+import { GraphQLError } from 'graphql';
 
 export interface GraphQLContext {
-  // currentUser: User | null;
+  currentUser: User | null;
   userRepo: ReturnType<typeof AppDataSource.getRepository>;
   friendshipRepo: ReturnType<typeof AppDataSource.getRepository>;
   postRepo: ReturnType<typeof AppDataSource.getRepository>;
@@ -20,11 +22,28 @@ export const context = async ({
   res,
   req,
 }: StandaloneServerContextFunctionArgument): Promise<GraphQLContext> => {
-  // const currentUser = await AppDataSource.getRepository(User).findOneBy({ id: curre})
+  const cookies = parseCookies(req.headers.cookie || '');
+  const token = cookies.accessToken;
+  let currentUser: User | null = null;
+
+  if (token) {
+    const decoded = verifyRefreshToken(token);
+    if (decoded) {
+      console.log(decoded);
+      currentUser = await AppDataSource.getRepository(User).findOneBy({
+        id: decoded.userId,
+      });
+    } else {
+      throw new GraphQLError('Access token expired', {
+        extensions: { code: 'UNAUTHENTICATED' },
+      });
+    }
+  }
 
   return {
     res,
     req,
+    currentUser,
     userRepo: AppDataSource.getRepository(User),
     friendshipRepo: AppDataSource.getRepository(Friendship),
     postRepo: AppDataSource.getRepository(Post),

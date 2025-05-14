@@ -9,11 +9,11 @@ export const postTypeDefs = `#graphql
 
   extend type Query {
     getAllPosts: [Post!]!
-    getPostById(id: ID!): Post
+    getPostByFriends: [Post]!
   }
 
   extend type Mutation {
-    createPost(content: string!): Post!
+    createPost(content: String!): Post!
     deletePost(id: ID!): Boolean!
   }
 `;

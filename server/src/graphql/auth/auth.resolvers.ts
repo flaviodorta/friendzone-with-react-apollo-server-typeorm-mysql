@@ -1,5 +1,10 @@
-import { comparePassword, generateTokens } from '../../utils/fn.ts';
+import {
+  comparePassword,
+  generateAccessToken,
+  generateRefreshToken,
+} from '../../utils/fn.ts';
 import { GraphQLContext } from '../context.ts';
+import jwt from 'jsonwebtoken';
 
 const login = async (
   _: any,
@@ -12,7 +17,14 @@ const login = async (
     throw new Error('Credenciais inválidas');
   }
 
-  const { accessToken, refreshToken } = generateTokens(user.id);
+  const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
+
+  console.log('🔐 ACCESS TOKEN:', accessToken);
+  console.log('🔐 REFRESH TOKEN:', refreshToken);
+
+  console.log('🔍 Decoded ACCESS:', jwt.decode(accessToken));
+  console.log('🔍 Decoded REFRESH:', jwt.decode(refreshToken));
 
   const userAgent = req.headers['user-agent'] || 'unknown';
   const ip =
@@ -31,7 +43,7 @@ const login = async (
 
   res.setHeader('Set-Cookie', [
     `accessToken=${accessToken}; HttpOnly; Path=/; Max-Age=900; SameSite=Strict; Secure`,
-    `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=900; SameSite=Strict; Secure`,
+    `refreshToken=${refreshToken}; HttpOnly; Path=/; Max-Age=2592000; SameSite=Strict; Secure`,
   ]);
 
   return {

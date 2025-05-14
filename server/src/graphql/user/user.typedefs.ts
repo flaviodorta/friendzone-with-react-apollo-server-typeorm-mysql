@@ -17,10 +17,18 @@ export const userTypeDefs = `#graphql
 
   extend type Query {
     getUserById(id: ID!): User
+    getUsersByName(name: String!): [User!]!
+    
   }
 
   extend type Mutation {
-    createUser(data: CreateUserInput!): User!
+    createUser(firstName: String!
+    lastName: String!
+    email: String!
+    password: String!
+    birthday: String!
+    gender: String!
+    ): User!
   }
 
   input CreateUserInput {
@@ -29,5 +37,6 @@ export const userTypeDefs = `#graphql
     email: String!
     password: String!
     birthday: String!
+    gender: String!
   }
 `;

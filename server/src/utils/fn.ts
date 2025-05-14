@@ -1,23 +1,52 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { User } from '../typeorm/entities/user.entity.ts';
+import { GraphQLError } from 'graphql';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+import { v4 as uuidv4 } from 'uuid';
+
+const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET as string;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
+
+export const generateAccessToken = (userId: string) => {
+  return jwt.sign(
+    {
+      userId,
+    },
+    'JWT_ACCESS_SECRET',
+    { expiresIn: '15m' }
+  );
+};
+
+export const generateRefreshToken = (userId: string) => {
+  return jwt.sign(
+    {
+      userId,
+    },
+    'JWT_REFRESH_SECRET',
+    { expiresIn: '30d' }
+  );
+};
 
 export const hashPassword = async (password: string) => {
   return await bcrypt.hash(password, 10);
 };
 
-export const generateTokens = (userId: string) => {
-  const accessToken = jwt.sign({ userId }, 'JWT_SECRET', { expiresIn: '15m' });
-  const refreshToken = jwt.sign({ userId }, 'JWT_SECRET', { expiresIn: '30d' });
-
-  return { accessToken, refreshToken };
+export const verifyAccessToken = (token: string) => {
+  try {
+    const decoded = jwt.verify(token, JWT_ACCESS_SECRET);
+    return decoded as { userId: string };
+  } catch {
+    return null;
+  }
 };
 
-export const verifyToken = (token: string) => {
+export const verifyRefreshToken = (token: string) => {
   try {
-    const decoded = jwt.verify(token, 'JWT_SECRET');
-    return decoded;
+    const decoded = jwt.verify(token, JWT_REFRESH_SECRET);
+    return decoded as { userId: string };
   } catch {
     return null;
   }
@@ -37,4 +66,12 @@ export const parseCookies = (cookieHeader: string): Record<string, string> => {
       .map((c) => c.trim().split('='))
       .filter((arr) => arr.length === 2)
   );
+};
+
+export const ensureAuthenticated = (currenttUser: User | null) => {
+  if (!currenttUser) {
+    throw new GraphQLError('Access token expired or missing.', {
+      extensions: { code: 'UNAUTHENTICATED' },
+    });
+  }
 };

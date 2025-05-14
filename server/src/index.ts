@@ -1,10 +1,12 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
 import { AppDataSource } from './typeorm/config/data-source.ts';
 import { typeDefs, resolvers } from './graphql/schema.ts';
 import { context } from './graphql/context.ts';
+import express from 'express';
+import cors from 'cors';
+import { expressMiddleware } from '@apollo/server/express4';
 
 export async function waitForDatabaseConnection(
   connectFn: () => Promise<any>,
@@ -27,35 +29,34 @@ export async function waitForDatabaseConnection(
   );
 }
 
-const users = [
-  {
-    id: '1',
-    name: 'Joe',
-    email: 'joe@gmail.com',
-    password: '1234',
-    avatar_url: 'asd',
-    bio: 'asd',
-    created_at: 'asdd',
-  },
-];
-
 async function startServer() {
   try {
-    // await AppDataSource.initialize();
     await waitForDatabaseConnection(() => AppDataSource.initialize());
     console.log('TypeORM conectado ao MySQL com sucesso!');
+
+    const app = express();
+
+    app.use(
+      cors({
+        origin: 'http://localhost:5173',
+        credentials: true,
+      })
+    );
+
+    app.use(express.json());
 
     const server = new ApolloServer({
       typeDefs,
       resolvers,
     });
 
-    const { url } = await startStandaloneServer(server, {
-      listen: { port: 4000 },
-      context,
-    });
+    await server.start();
 
-    console.log(`🚀 Server ready at: ${url}`);
+    app.use('/graphql', expressMiddleware(server, { context }));
+
+    app.listen(4000, () => {
+      console.log('🚀 Server running on http://localhost:4000/graphql');
+    });
   } catch (err) {
     console.log('Erro ao iniciar o servidor', err);
   }

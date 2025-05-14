@@ -18,7 +18,7 @@ export const friendshipTypeDefs = `#graphql
   extend type Query {
     getMyFriends: [User!]!
     getPendingFriendRequests: [Friendship!]!
-    getSentFriendRequests: [Friendship!]!
+    getSentFriendRequest(toUserId: String!): [Friendship!]!
   }
 
   extend type Mutation {
