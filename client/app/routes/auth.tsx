@@ -28,6 +28,9 @@ import { useLogin } from '~/hooks/use-login';
 import { FaSpinner } from 'react-icons/fa';
 import { useNavigate } from 'react-router';
 import { useCreateUser } from '~/hooks/use-create-user';
+import { useApolloClient } from '@apollo/client/index.js';
+import { useAuth } from '~/context/auth-provider';
+import { useEffect } from 'react';
 
 const formSchemaSignIn = z.object({
   email: z
@@ -60,8 +63,23 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Login() {
   const [login, { loading, error }] = useLogin();
+  const client = useApolloClient();
   const [createUser] = useCreateUser();
+
+  const { session, loading: loadingAuth } = useAuth();
   const navigate = useNavigate();
+
+  console.log('loading auth', loadingAuth);
+
+  useEffect(() => {
+    let t;
+    if (!loadingAuth && session) {
+      t = setTimeout(() => {
+        navigate('/feed', { replace: true });
+      }, 1500);
+    }
+  }, [loading, session]);
+
   const formSignIn = useForm<z.infer<typeof formSchemaSignIn>>({
     resolver: zodResolver(formSchemaSignIn),
     defaultValues: {
@@ -91,15 +109,15 @@ export default function Login() {
         },
       });
       console.log(data);
-      navigate('/feed');
+      await client.refetchQueries({ include: ['GetSessionFromRefreshToken'] });
+      navigate('/feed', { replace: true });
     } catch (err) {
-      console.error('erro login', err);
+      console.error('error login', err);
     }
   }
 
   async function onSubmitSignUp(values: z.infer<typeof formSchemaSignUp>) {
     try {
-      // console.log(values);
       const { data } = await createUser({
         variables: {
           email: values.email,
@@ -114,6 +132,15 @@ export default function Login() {
     } catch (err) {
       console.log('error sign up', err);
     }
+  }
+
+  if (loadingAuth || session) {
+    return (
+      <div className='h-full w-full flex font-extrabold justify-center items-center text-9xl'>
+        <IconsBackground />
+        <h1 className='z-50 -translate-y-12'>FriendZone</h1>
+      </div>
+    );
   }
 
   return (

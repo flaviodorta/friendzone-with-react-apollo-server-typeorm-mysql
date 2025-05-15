@@ -5,6 +5,8 @@ import { useAuth } from '../context/auth-provider';
 const ProtectedRoute = () => {
   const { session, loading } = useAuth();
 
+  console.log('session', session);
+
   if (loading) return <div>Verificando sessão...</div>;
 
   if (!session) {

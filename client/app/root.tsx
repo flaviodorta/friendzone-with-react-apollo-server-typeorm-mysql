@@ -35,9 +35,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <ApolloHydrationHelper>
-          <AuthProvider>{children}</AuthProvider>
-        </ApolloHydrationHelper>
+        <ApolloHydrationHelper>{children}</ApolloHydrationHelper>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -46,7 +44,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <AuthProvider>
+      <Outlet />
+    </AuthProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

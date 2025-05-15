@@ -23,19 +23,14 @@ export const context = async ({
   req,
 }: StandaloneServerContextFunctionArgument): Promise<GraphQLContext> => {
   const cookies = parseCookies(req.headers.cookie || '');
-  const token = cookies.accessToken;
+  const token = cookies.refreshToken;
   let currentUser: User | null = null;
 
   if (token) {
     const decoded = verifyRefreshToken(token);
     if (decoded) {
-      console.log(decoded);
       currentUser = await AppDataSource.getRepository(User).findOneBy({
         id: decoded.userId,
-      });
-    } else {
-      throw new GraphQLError('Access token expired', {
-        extensions: { code: 'UNAUTHENTICATED' },
       });
     }
   }

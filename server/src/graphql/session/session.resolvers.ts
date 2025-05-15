@@ -7,11 +7,14 @@ export const sessionResolvers = {
     getSessionFromRefreshToken: async (
       _: any,
       __: any,
-      { req, sessionRepo }: GraphQLContext
+      { req, sessionRepo, res }: GraphQLContext
     ) => {
       const cookies = parseCookies(req.headers.cookie || '');
       const refreshToken =
         cookies['refreshToken'] || req.headers['x-refresh-token'];
+      const userAgent = req.headers['user-agent'] || 'unknown';
+      const ip =
+        req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unkown';
 
       if (!refreshToken) {
         throw new GraphQLError('Refresh token missing', {
@@ -24,10 +27,21 @@ export const sessionResolvers = {
         relations: ['user'],
       });
 
-      if (!session || session.revoked || session.expiresAt < new Date()) {
+      if (
+        !session ||
+        session.revoked ||
+        session.expiresAt < new Date() ||
+        userAgent !== session.userAgent ||
+        ip !== session.ip
+      ) {
         throw new GraphQLError('Invalid or expired session', {
           extensions: { code: 'UNAUTHENTICATED' },
         });
+      }
+
+      if (session && session.expiresAt < new Date()) {
+        session.revoked = true;
+        await sessionRepo.save(session);
       }
 
       return session;

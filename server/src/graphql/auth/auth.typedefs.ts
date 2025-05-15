@@ -1,6 +1,5 @@
 export const authTypeDefs = `#graphql
   type AuthPayload {
-    accessToken: String!
     user: User!
   }
 

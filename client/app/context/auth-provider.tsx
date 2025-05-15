@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client/index.js';
+import { useLazyQuery, useQuery } from '@apollo/client/index.js';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Navigate } from 'react-router';
 import { GET_SESSION } from '~/graphql/get-session';
@@ -9,19 +9,11 @@ const AuthContext = createContext({
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [session, setSession] = useState(null);
-  const [loadSession, { data, loading }] = useLazyQuery(GET_SESSION);
+  const { data, loading } = useQuery(GET_SESSION);
 
-  useEffect(() => {
-    loadSession();
-  }, []);
+  const session = data?.getSessionFromRefreshToken ?? null;
 
-  useEffect(() => {
-    if (data?.getSessionFromRefreshToken) {
-      setSession(data.getSessionFromRefreshToken);
-      console.log('session', session);
-    }
-  }, [data]);
+  console.log('session', session);
 
   return (
     <AuthContext.Provider value={{ session, loading }}>

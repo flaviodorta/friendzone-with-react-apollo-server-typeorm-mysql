@@ -6,7 +6,7 @@ export const GET_SESSION = gql`
       id
       user {
         id
-        name
+        firstName
         lastName
         email
       }
