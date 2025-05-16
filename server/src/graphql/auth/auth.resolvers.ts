@@ -1,6 +1,5 @@
 import { comparePassword, generateRefreshToken } from '../../utils/fn.ts';
 import { GraphQLContext } from '../context.ts';
-import jwt from 'jsonwebtoken';
 
 const login = async (
   _: any,
@@ -15,14 +14,12 @@ const login = async (
 
   console.log('HERE');
 
-  // const accessToken = generateAccessToken(user.id);
   const refreshToken = generateRefreshToken(user.id);
 
   const userAgent = req.headers['user-agent'] || 'unknown';
   const ip =
     req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unkown';
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-  // const expiresAt = new Date(Date.now() + 10 * 1000);
 
   const session = sessionRepo.create({
     user,
