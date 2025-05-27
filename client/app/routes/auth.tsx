@@ -134,14 +134,14 @@ export default function Login() {
     }
   }
 
-  if (loadingAuth || session) {
-    return (
-      <div className='h-full w-full flex font-extrabold justify-center items-center text-9xl'>
-        <IconsBackground />
-        <h1 className='z-50 -translate-y-12'>FriendZone</h1>
-      </div>
-    );
-  }
+  // if (loadingAuth || session) {
+  //   return (
+  //     <div className='h-full w-full flex font-extrabold justify-center items-center text-9xl'>
+  //       <IconsBackground />
+  //       <h1 className='z-50 -translate-y-12'>FriendZone</h1>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className='h-full flex  justify-center'>

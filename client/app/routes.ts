@@ -8,5 +8,8 @@ import {
 export default [
   index('routes/auth.tsx'),
 
-  layout('components/protected-route.tsx', [route('feed', 'routes/feed.tsx')]),
+  layout('components/protected-route.tsx', [
+    route('feed', 'routes/feed.tsx'),
+    route('friends', 'routes/friends.tsx'),
+  ]),
 ] satisfies RouteConfig;

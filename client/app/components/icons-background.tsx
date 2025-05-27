@@ -1,3 +1,5 @@
+'use server';
+
 // components/IconBackground.tsx
 import {
   FaBeer,
