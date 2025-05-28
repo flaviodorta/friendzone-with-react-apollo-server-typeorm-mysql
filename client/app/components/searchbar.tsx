@@ -41,7 +41,7 @@ export const Searchbar = ({
       {showDropdownMobile && (
         <div
           ref={ref}
-          className='fixed left-0 w-full p-4 top-0 bg-white shadow-2xl lg:hidden'
+          className='fixed z-50 left-0 w-full p-4 top-0 bg-white shadow-2xl lg:hidden'
         >
           <span className='absolute top-1/2 -translate-y-1/2 left-8'>
             <FaSearch />

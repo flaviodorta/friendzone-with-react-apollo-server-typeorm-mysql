@@ -11,5 +11,6 @@ export default [
   layout('components/protected-route.tsx', [
     route('feed', 'routes/feed.tsx'),
     route('friends', 'routes/friends.tsx'),
+    route('groups', 'routes/groups.tsx'),
   ]),
 ] satisfies RouteConfig;
