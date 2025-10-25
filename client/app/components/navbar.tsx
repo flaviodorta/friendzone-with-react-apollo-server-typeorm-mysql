@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { FaSearch, FaUser } from 'react-icons/fa';
 import { FaBell } from 'react-icons/fa';
-import { MdGroups2 } from 'react-icons/md';
+import { MdGroups2, MdLogout } from 'react-icons/md';
 import { useSearchUsers } from '~/hooks/use-search-users';
 import { Searchbar } from './searchbar';
 import { GoHomeFill } from 'react-icons/go';
@@ -14,6 +14,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
+import { useAuth } from '~/context/auth-provider';
+import { useOnClickOutside } from 'usehooks-ts';
+import { useApolloClient, useMutation } from '@apollo/client/index.js';
+import { REVOKE_SESSION } from '~/graphql/revoke-session';
 
 export const Navbar = () => {
   const [query, setQuery] = useState('');
@@ -42,6 +46,65 @@ export const Navbar = () => {
   }, [query]);
 
   const users = data?.getUsersByName ?? [];
+
+  const [showDropdownUser, setShowdropdownUser] = useState(false);
+
+  const { session } = useAuth();
+
+  const ref = useRef<HTMLDivElement>(null!);
+
+  useOnClickOutside(ref, () => setShowdropdownUser(false));
+
+  const refDropdown = useRef<HTMLDivElement>(null);
+  const refButton = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        refDropdown.current &&
+        refButton.current &&
+        !refDropdown.current.contains(event.target as Node) &&
+        !refButton.current.contains(event.target as Node)
+      ) {
+        setShowdropdownUser(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const [
+    revokeSession,
+    { loading: loadingRevokeSession, error, data: dataRevokeSession },
+  ] = useMutation(REVOKE_SESSION);
+
+  const client = useApolloClient();
+
+  const handleLogout = async () => {
+    try {
+      const response = await revokeSession({
+        variables: { sessionId: session?.id },
+      });
+
+      if (response?.data?.revokeSession) {
+        console.log(
+          'Sessão revogada com sucesso!',
+          response?.data?.revokeSession
+        );
+        navigate('/', { replace: true });
+        await client.clearStore();
+      }
+    } catch (err) {
+      console.log('Error ao revogar sessão', err);
+    }
+  };
+
+  useEffect(() => {
+    console.log('session', session);
+  }, [session]);
 
   return (
     <TooltipProvider>
@@ -142,8 +205,39 @@ export const Navbar = () => {
               <p>Notifications</p>
             </TooltipContent>
           </Tooltip>
-          <div className='w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer'>
+          <div
+            ref={refButton}
+            onClick={() => setShowdropdownUser((prev) => !prev)}
+            className='w-10 h-10 relative rounded-full bg-gray-300 flex items-center justify-center cursor-pointer'
+          >
             <FaUser />
+
+            {showDropdownUser && (
+              <div
+                ref={refDropdown}
+                className='absolute p-4 flex flex-col gap-4 top-[130%] rounded-xs right-0 bg-white shadow w-[200px] h-[100px]'
+              >
+                <div
+                  onClick={() => navigate(`/profile/${session?.user.id}`)}
+                  className='flex gap-2 items-center'
+                >
+                  <span>
+                    {session?.user.profilePhotoUrl ? (
+                      session?.user.profilePhotoUrl
+                    ) : (
+                      <FaUser />
+                    )}
+                  </span>
+                  <span>{session?.user.firstName}</span>
+                </div>
+                <div onClick={handleLogout} className='flex items-center gap-2'>
+                  <span>
+                    <MdLogout />
+                  </span>
+                  <span>Logout</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

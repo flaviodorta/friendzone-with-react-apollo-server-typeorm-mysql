@@ -16,6 +16,7 @@ export interface GraphQLContext {
   sessionRepo: ReturnType<typeof AppDataSource.getRepository>;
   req: IncomingMessage;
   res: ServerResponse;
+  token: string;
 }
 
 export const context = async ({
@@ -25,20 +26,27 @@ export const context = async ({
   const cookies = parseCookies(req.headers.cookie || '');
   const token = cookies.refreshToken;
   let currentUser: User | null = null;
+  console.log('token', token);
 
   if (token) {
     const decoded = verifyRefreshToken(token);
+    console.log('decoded', decoded);
     if (decoded) {
       currentUser = await AppDataSource.getRepository(User).findOneBy({
         id: decoded.userId,
       });
+    } else {
     }
   }
+
+  console.log('current user', currentUser);
+  console.log('HERE');
 
   return {
     res,
     req,
     currentUser,
+    token,
     userRepo: AppDataSource.getRepository(User),
     friendshipRepo: AppDataSource.getRepository(Friendship),
     postRepo: AppDataSource.getRepository(Post),

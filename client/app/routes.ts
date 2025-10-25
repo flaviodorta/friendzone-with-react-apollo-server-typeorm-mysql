@@ -12,5 +12,6 @@ export default [
     route('feed', 'routes/feed.tsx'),
     route('friends', 'routes/friends.tsx'),
     route('groups', 'routes/groups.tsx'),
+    route('profile/:userId', 'routes/profile.tsx'),
   ]),
 ] satisfies RouteConfig;

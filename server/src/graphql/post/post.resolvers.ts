@@ -3,6 +3,20 @@ import { ensureAuthenticated } from '../../utils/fn.ts';
 import { GraphQLContext } from '../context.ts';
 import { GraphQLError } from 'graphql';
 
+const getPostByUserId = async (
+  _: any,
+  { userId }: { userId: string },
+  { currentUser, postRepo }: GraphQLContext
+) => {
+  ensureAuthenticated(currentUser);
+
+  return await postRepo.find({
+    where: { author: { id: userId } },
+    order: { createdAt: 'DESC' },
+    relations: ['author'],
+  });
+};
+
 const getAllPosts = async (
   _: any,
   __: any,
@@ -93,6 +107,7 @@ export const postResolvers = {
   Query: {
     getAllPosts,
     getPostByFriends,
+    getPostByUserId,
   },
   Mutation: {
     createPost,

@@ -1,13 +1,13 @@
 import { GraphQLContext } from '../context.ts';
 import { GraphQLError } from 'graphql';
-import { parseCookies } from '../../utils/fn.ts';
+import { parseCookies, verifyRefreshToken } from '../../utils/fn.ts';
 
 export const sessionResolvers = {
   Query: {
     getSessionFromRefreshToken: async (
       _: any,
       __: any,
-      { req, sessionRepo, res }: GraphQLContext
+      { req, sessionRepo, res, token }: GraphQLContext
     ) => {
       const cookies = parseCookies(req.headers.cookie || '');
       const refreshToken =
@@ -39,7 +39,9 @@ export const sessionResolvers = {
         });
       }
 
-      if (session && session.expiresAt < new Date()) {
+      const decoded = verifyRefreshToken(token);
+
+      if ((session && session.expiresAt < new Date()) || !decoded) {
         session.revoked = true;
         await sessionRepo.save(session);
       }
@@ -52,7 +54,7 @@ export const sessionResolvers = {
     revokeSession: async (
       _: any,
       { sessionId }: { sessionId: string },
-      { currentUser, sessionRepo }: GraphQLContext
+      { currentUser, sessionRepo, res }: GraphQLContext
     ) => {
       const session = await sessionRepo.findOne({
         where: { id: sessionId },
@@ -66,8 +68,12 @@ export const sessionResolvers = {
       }
 
       session.revoked = true;
+      res.setHeader(
+        'Set-Cookie',
+        'refreshToken=; HttpOnly; Max-Age=0; Path=/; SameSite=Lax'
+      );
       await sessionRepo.save(session);
-      return true;
+      return session;
     },
   },
 };

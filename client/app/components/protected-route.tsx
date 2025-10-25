@@ -9,7 +9,7 @@ const ProtectedRoute = () => {
 
   if (loading) return <div>Verificando sessão...</div>;
 
-  if (!session) {
+  if (!session || session.revoked) {
     return <Navigate to='/' replace />;
   }
 

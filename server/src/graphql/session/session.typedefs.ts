@@ -15,6 +15,6 @@ export const sessionTypeDefs = `#graphql
   }
 
   extend type Mutation {
-    revokeSession(sessionId: ID!): Boolean!
+    revokeSession(sessionId: ID!): Session!
   }
 `;

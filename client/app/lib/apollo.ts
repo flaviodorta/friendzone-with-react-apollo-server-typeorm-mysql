@@ -22,6 +22,7 @@ const errorLink = onError(
         if (err.extensions?.code === 'UNAUTHENTICATED') {
           // Aqui você pode acionar um refresh token, logout, etc.
           console.warn('Usuário não autenticado.');
+          window.dispatchEvent(new Event('auto-logout'));
         }
 
         if (err.extensions?.code === 'FORBIDDEN') {
